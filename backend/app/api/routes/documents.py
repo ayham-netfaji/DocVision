@@ -1,8 +1,9 @@
 import uuid
-import shutil
-from pathlib import Path
-from fastapi import APIRouter, UploadFile, File, HTTPException, status
-from app.schemas.document import DocumentScanResponse
+from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
+from sqlalchemy.orm import Session
+from app.db.session import get_db
+from app.db import crud
+from app.schemas.document import DocumentScanResponse, ProcessingStagePreview
 from app.utils.file_utils import validate_image_file
 from app.core.config import settings
 
@@ -10,13 +11,9 @@ router = APIRouter()
 
 @router.post("/scan", response_model=DocumentScanResponse)
 async def scan_document(
-    image: UploadFile = File(...)
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db)
 ):
-    """
-    Accepts an uploaded image file, validates format and size,
-    saves temporarily, and returns an initial scan stub response
-    ready for OpenCV and OCR processing pipeline stages.
-    """
     # 1. Validation
     ext = validate_image_file(image)
     
@@ -93,7 +90,6 @@ async def scan_document(
     # 7. Image Enhancement (Phase 8)
     from app.services.image_enhancer import ImageEnhancer
     from app.services.ocr_service import OCRService
-    from app.schemas.document import ProcessingStagePreview
 
     enhancer = ImageEnhancer()
     enhanced_doc = enhancer.enhance(warped_doc, mode="scan_bw")
@@ -114,6 +110,19 @@ async def scan_document(
     if not extracted_text:
         extracted_text = "[No text detected in document image]"
         confidence = 0.0
+
+    # 9. Persistent Database Storage (Phase 12)
+    crud.create_document_record(
+        db=db,
+        doc_id=doc_id,
+        filename=image.filename or filename,
+        original_path=f"/uploads/{filename}",
+        processed_path=f"/uploads/{processed_filename}",
+        text=extracted_text,
+        confidence=confidence,
+        word_count=word_count,
+        char_count=char_count
+    )
 
     stages = [
         ProcessingStagePreview(
@@ -148,7 +157,6 @@ async def scan_document(
         ),
     ]
 
-    # 9. Complete Response
     return DocumentScanResponse(
         document_id=doc_id,
         status="completed",
@@ -161,9 +169,49 @@ async def scan_document(
         stages=stages
     )
 
+@router.get("")
+async def list_documents(limit: int = 50, offset: int = 0, db: Session = Depends(get_db)):
+    """
+    Returns list of all saved documents and their OCR summaries.
+    """
+    docs = crud.get_all_documents(db, limit=limit, offset=offset)
+    return [
+        {
+            "document_id": d.id,
+            "filename": d.filename,
+            "status": d.status,
+            "original_image_url": d.original_image_path,
+            "processed_image_url": d.processed_image_path,
+            "text": d.ocr_result.text if d.ocr_result else "",
+            "confidence": d.ocr_result.confidence if d.ocr_result else 0.0,
+            "word_count": d.ocr_result.word_count if d.ocr_result else 0,
+            "character_count": d.ocr_result.character_count if d.ocr_result else 0,
+            "created_at": d.created_at.isoformat() if d.created_at else None
+        }
+        for d in docs
+    ]
+
 @router.get("/{document_id}")
-async def get_document(document_id: str):
+async def get_document(document_id: str, db: Session = Depends(get_db)):
+    doc = crud.get_document_by_id(db, document_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
     return {
-        "document_id": document_id,
-        "status": "ready"
+        "document_id": doc.id,
+        "filename": doc.filename,
+        "status": doc.status,
+        "original_image_url": doc.original_image_path,
+        "processed_image_url": doc.processed_image_path,
+        "text": doc.ocr_result.text if doc.ocr_result else "",
+        "confidence": doc.ocr_result.confidence if doc.ocr_result else 0.0,
+        "word_count": doc.ocr_result.word_count if doc.ocr_result else 0,
+        "character_count": doc.ocr_result.character_count if doc.ocr_result else 0,
+        "created_at": doc.created_at.isoformat() if doc.created_at else None
     }
+
+@router.delete("/{document_id}")
+async def delete_document(document_id: str, db: Session = Depends(get_db)):
+    success = crud.delete_document_by_id(db, document_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Document not found")
+    return {"message": "Document deleted successfully", "document_id": document_id}

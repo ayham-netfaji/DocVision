@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     upload_dir: Path = Path("uploads")
     max_file_size: int = 10 * 1024 * 1024  # 10MB
     allowed_extensions: set[str] = {"jpg", "jpeg", "png", "webp"}
+    database_url: str = "sqlite:///./docvision.db"
 
     model_config = {"env_prefix": "DOCVISION_"}
 

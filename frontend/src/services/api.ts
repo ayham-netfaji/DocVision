@@ -22,3 +22,18 @@ export const scanDocumentImage = async (file: File): Promise<ProcessedDocument> 
 
   return data;
 };
+
+export const listDocuments = async (): Promise<ProcessedDocument[]> => {
+  const { data } = await apiClient.get<ProcessedDocument[]>('/documents');
+  return data;
+};
+
+export const getDocumentById = async (id: string): Promise<ProcessedDocument> => {
+  const { data } = await apiClient.get<ProcessedDocument>(`/documents/${id}`);
+  return data;
+};
+
+export const deleteDocumentById = async (id: string): Promise<{ message: string }> => {
+  const { data } = await apiClient.delete<{ message: string }>(`/documents/${id}`);
+  return data;
+};

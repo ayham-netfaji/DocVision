@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 10 — Result UI & "Show Processing" Demo |
+| **Active Phase** | Phase 11 — Export (PDF & TXT) |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 11 — Export (PDF & TXT) |
+| **Next Phase** | Phase 12 — Database & History |
 | **Blockers** | None |
-| **Last Action** | Result UI expanded with Academic CV stages decomposition, font zoom, stats, copy & download |
+| **Last Action** | ReportLab PDFExporter built, /api/v1/export/{id}/pdf endpoint streaming, 25/25 pytest passing |
 
 ---
 
@@ -119,7 +119,13 @@
 - [x] Text reader font size selector (S / M / L)
 - [x] Character count, word count, and confidence percentage badges
 - [x] Copy to clipboard & TXT download functionality
-- [x] Clean production build verified (`tsc -b && vite build`)
+**Phase 11 completed same session:**
+- [x] Installed `reportlab` in backend virtualenv
+- [x] Created `backend/app/services/pdf_exporter.py` with custom styles, metadata, confidence badge, and embedded scan preview
+- [x] Added `GET /api/v1/export/{document_id}/pdf` streaming response endpoint
+- [x] Connected frontend `Result.tsx` toolbar with **Download PDF** and **Download TXT** buttons
+- [x] Created unit tests `tests/test_pdf_exporter.py` and API test `tests/test_export.py`
+- [x] **Gate test PASSED:** 25/25 pytest assertions pass, clean Vite production build
 - [x] Committed to Git repository
 
 ---
@@ -139,7 +145,7 @@
 | 8 | Image Enhancement | ✅ Done | ✅ |
 | 9 | OCR Integration | ✅ Done | ✅ |
 | 10 | Result UI | ✅ Done | ✅ |
-| 11 | Export | ⬜ Not Started | ⬜ |
+| 11 | Export | ✅ Done | ✅ |
 | 12 | Database & History | ⬜ Not Started | ⬜ |
 | 13 | Testing & Quality | ⬜ Not Started | ⬜ |
 | 14 | Docker | ⬜ Not Started | ⬜ |
@@ -149,12 +155,14 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 11 — Export (PDF)
-- Add PDF export backend endpoint using ReportLab (`GET /api/v1/documents/{id}/pdf`)
-- Bundle processed document image, extracted text, and confidence header into clean formatted PDF
-- Add Download PDF button in frontend `Result.tsx`
-- Unit test: verify PDF generation and headers
-- Run Phase 11 test gate before Phase 12
+**Start with:** Phase 12 — Database & History
+- Install `SQLAlchemy` and SQLite / PostgreSQL driver (using SQLite default with zero-config setup for seamless local run and testing, PostgreSQL URL configurable via env)
+- Create database models: `DocumentModel`, `OCRResultModel` in `backend/app/db/models.py`
+- Session management in `backend/app/db/session.py`
+- CRUD operations in `backend/app/db/crud.py`
+- List documents endpoint `GET /api/v1/documents`, get doc `GET /api/v1/documents/{id}`, delete `DELETE /api/v1/documents/{id}`
+- Connect frontend `History.tsx` to display real scan history with thumbnails, stats, and delete actions
+- Run Phase 12 test gate before Phase 13
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

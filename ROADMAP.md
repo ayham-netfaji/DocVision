@@ -103,9 +103,12 @@
 
 ---
 
-## Phase 11 — Export
-- [ ] Download PDF (use ReportLab or simple HTML-to-PDF)
-- **Gate:** PDF downloads with extracted text
+## Phase 11 — Export ✅
+- [x] Download PDF service via ReportLab (`pdf_exporter.py`)
+- [x] Streaming PDF endpoint `GET /api/v1/export/{id}/pdf`
+- [x] Download PDF button in frontend `Result.tsx` toolbar
+- [x] Download TXT button in frontend
+- **Gate:** ✅ Pytest passes 25/25 tests, PDF downloads with formatted report, confidence header and embedded scan image
 
 ---
 
