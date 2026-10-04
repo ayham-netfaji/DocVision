@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 2 — Frontend Foundation |
+| **Active Phase** | Phase 3 — Backend Foundation |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 3 — Backend Foundation |
+| **Next Phase** | Phase 4 — Image Upload Integration |
 | **Blockers** | None |
-| **Last Action** | Tailwind, React Router, Navbar, UploadZone, Pages built, tested & committed |
+| **Last Action** | Schemas, scan upload route, file validator, and Pytest suite passing 4/4 |
 
 ---
 
@@ -63,8 +63,13 @@
 - [x] Responsive dark modern Navbar with Lucide icons
 - [x] `UploadZone` component with drag & drop, client validation (10MB max, JPG/PNG/WEBP)
 - [x] Full production build verified (`tsc -b && vite build`)
-- [x] **Gate test PASSED:** 200 OK on dev server, route structure ready
-- [x] Committed to Git repository
+**Phase 3 completed same session:**
+- [x] Pydantic schemas created (`DocumentScanResponse`, `OCRResponse`, `OCRBoundingBox`)
+- [x] Document scanning API route implemented: `POST /api/v1/documents/scan`
+- [x] Robust file validation (10MB size limit, content-type and extension validation)
+- [x] Pytest suite created (`tests/test_api.py`)
+- [x] **Gate test PASSED:** 4/4 pytest assertions pass (Health, OCR, Upload, Validation)
+- [x] Updated `requirements.txt` and committed to Git
 
 ---
 
@@ -75,7 +80,7 @@
 | 0 | Architecture & Planning | ✅ Done | ✅ |
 | 1 | Project Setup | ✅ Done | ✅ |
 | 2 | Frontend Foundation | ✅ Done | ✅ |
-| 3 | Backend Foundation | ⬜ Not Started | ⬜ |
+| 3 | Backend Foundation | ✅ Done | ✅ |
 | 4 | Image Upload Integration | ⬜ Not Started | ⬜ |
 | 5 | CV Pipeline Core | ⬜ Not Started | ⬜ |
 | 6 | Document Detection | ⬜ Not Started | ⬜ |
@@ -93,13 +98,12 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 3 — Backend Foundation
-- FastAPI backend routes structure: `documents.py`, `ocr.py`
-- Pydantic schemas: `document.py`, `ocr.py`
-- Document scan endpoint `POST /api/v1/documents/scan` (accept image, file validation, stub pipeline response)
-- Temp file handling and size limits
-- Pytest or curl verification of endpoints
-- Run Phase 3 gate test before Phase 4
+**Start with:** Phase 4 — Image Upload Integration
+- Connect React frontend to `POST /api/v1/documents/scan` via Axios
+- Pass actual uploaded file from `UploadZone` to `Scanner` and submit
+- Processing status UI component with live visual steps (Image upload, pre-processing, extraction)
+- Update `Result.tsx` to display real API document ID, confidence, and preview
+- Gate test: Upload image from web UI, receive live JSON from backend, view in UI
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

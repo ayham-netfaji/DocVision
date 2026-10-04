@@ -1,10 +1,10 @@
 export interface ProcessedDocument {
   document_id: string;
   status: 'pending' | 'processing' | 'completed' | 'failed';
-  original_image: string;
-  processed_image?: string;
-  text?: string;
-  confidence?: number;
+  original_image_url: string;
+  processed_image_url?: string;
+  text: string;
+  confidence: number;
   created_at?: string;
 }
 

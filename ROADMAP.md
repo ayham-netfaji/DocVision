@@ -32,14 +32,14 @@
 
 ---
 
-## Phase 3 — Backend Foundation
-- [ ] FastAPI project structure (`api/routes/`, `services/`, `schemas/`, `core/`, `utils/`)
-- [ ] Pydantic schemas for document & OCR response
-- [ ] CORS config
-- [ ] File upload endpoint `POST /api/v1/documents/scan` (accept image, return stub)
-- [ ] File validation (type, size)
-- [ ] Temp file cleanup
-- **Gate:** Upload image via curl/Postman, get stub JSON back, invalid files rejected
+## Phase 3 — Backend Foundation ✅
+- [x] FastAPI project structure (`api/routes/`, `services/`, `schemas/`, `core/`, `utils/`)
+- [x] Pydantic schemas for document & OCR response
+- [x] CORS config
+- [x] File upload endpoint `POST /api/v1/documents/scan` (accept image, return stub)
+- [x] File validation (type, size)
+- [x] Temp file cleanup
+- **Gate:** ✅ Pytest passes all 4 tests (health, OCR status, upload validation, format checking)
 
 ---
 
