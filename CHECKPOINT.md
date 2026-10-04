@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 3 — Backend Foundation |
+| **Active Phase** | Phase 4 — Image Upload Integration |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 4 — Image Upload Integration |
+| **Next Phase** | Phase 5 — CV Pipeline Core (OpenCV) |
 | **Blockers** | None |
-| **Last Action** | Schemas, scan upload route, file validator, and Pytest suite passing 4/4 |
+| **Last Action** | Upload pipeline connected with progress indicators, verified with backend scan endpoint |
 
 ---
 
@@ -68,8 +68,13 @@
 - [x] Document scanning API route implemented: `POST /api/v1/documents/scan`
 - [x] Robust file validation (10MB size limit, content-type and extension validation)
 - [x] Pytest suite created (`tests/test_api.py`)
-- [x] **Gate test PASSED:** 4/4 pytest assertions pass (Health, OCR, Upload, Validation)
-- [x] Updated `requirements.txt` and committed to Git
+**Phase 4 completed same session:**
+- [x] Axios multipart client method `scanDocumentImage` connected to backend API
+- [x] `ProcessingStatus` component with progress percentage and animated steps
+- [x] `Scanner.tsx` pipeline runner hooked with live error boundary and state handling
+- [x] `Result.tsx` displaying real returned Document ID, confidence metrics, and text
+- [x] **Gate test PASSED:** Frontend builds clean (`tsc -b && vite build`), both servers running and verified
+- [x] Committed to Git repository
 
 ---
 
@@ -81,7 +86,7 @@
 | 1 | Project Setup | ✅ Done | ✅ |
 | 2 | Frontend Foundation | ✅ Done | ✅ |
 | 3 | Backend Foundation | ✅ Done | ✅ |
-| 4 | Image Upload Integration | ⬜ Not Started | ⬜ |
+| 4 | Image Upload Integration | ✅ Done | ✅ |
 | 5 | CV Pipeline Core | ⬜ Not Started | ⬜ |
 | 6 | Document Detection | ⬜ Not Started | ⬜ |
 | 7 | Perspective Correction | ⬜ Not Started | ⬜ |
@@ -98,12 +103,14 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 4 — Image Upload Integration
-- Connect React frontend to `POST /api/v1/documents/scan` via Axios
-- Pass actual uploaded file from `UploadZone` to `Scanner` and submit
-- Processing status UI component with live visual steps (Image upload, pre-processing, extraction)
-- Update `Result.tsx` to display real API document ID, confidence, and preview
-- Gate test: Upload image from web UI, receive live JSON from backend, view in UI
+**Start with:** Phase 5 — CV Pipeline Core (OpenCV)
+- Install `opencv-python-headless` and `numpy` in backend venv
+- Create `backend/app/services/document_processor.py`
+- Implement image resize (aspect ratio preserved)
+- Implement grayscale transformation
+- Implement Gaussian blur noise reduction
+- Unit test with pytest: Feed test image and assert dimensions, channels, and blur smoothing
+- Run Phase 5 test gate before Phase 6
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

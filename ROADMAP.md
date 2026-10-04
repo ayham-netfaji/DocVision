@@ -43,12 +43,12 @@
 
 ---
 
-## Phase 4 — Image Upload Integration
-- [ ] Connect frontend upload zone to backend endpoint via Axios
-- [ ] Show image preview after upload
-- [ ] Scanner page with "Scan Document" button
-- [ ] Processing status UI (step indicators + progress bar)
-- **Gate:** Upload from browser, see preview, click scan, see processing indicators
+## Phase 4 — Image Upload Integration ✅
+- [x] Connect frontend upload zone to backend endpoint via Axios
+- [x] Show image preview after upload
+- [x] Scanner page with "Scan Document" button
+- [x] Processing status UI (step indicators + progress bar)
+- **Gate:** ✅ TypeScript build clean, full E2E flow (upload -> progress simulation -> live scan response -> results)
 
 ---
 
