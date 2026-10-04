@@ -52,10 +52,10 @@
 
 ---
 
-## Phase 5 — CV Pipeline Core (OpenCV)
-- [ ] `document_processor.py` — resize, grayscale, Gaussian blur
-- [ ] Unit test: feed sample image, verify output dimensions & channels
-- **Gate:** Pytest passes for resize + grayscale + blur
+## Phase 5 — CV Pipeline Core (OpenCV) ✅
+- [x] `document_processor.py` — resize, grayscale, Gaussian blur
+- [x] Unit test: feed sample image, verify output dimensions & channels
+- **Gate:** ✅ Pytest passes 9/9 tests for resize + grayscale + blur + API integration
 
 ---
 

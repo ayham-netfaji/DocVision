@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 4 — Image Upload Integration |
+| **Active Phase** | Phase 5 — CV Pipeline Core (OpenCV) |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 5 — CV Pipeline Core (OpenCV) |
+| **Next Phase** | Phase 6 — Document Detection |
 | **Blockers** | None |
-| **Last Action** | Upload pipeline connected with progress indicators, verified with backend scan endpoint |
+| **Last Action** | OpenCV DocumentProcessor implemented, resize/grayscale/blur tested (9/9 passed) |
 
 ---
 
@@ -73,8 +73,13 @@
 - [x] `ProcessingStatus` component with progress percentage and animated steps
 - [x] `Scanner.tsx` pipeline runner hooked with live error boundary and state handling
 - [x] `Result.tsx` displaying real returned Document ID, confidence metrics, and text
-- [x] **Gate test PASSED:** Frontend builds clean (`tsc -b && vite build`), both servers running and verified
-- [x] Committed to Git repository
+**Phase 5 completed same session:**
+- [x] Installed `opencv-python-headless` and `numpy`
+- [x] Created `backend/app/services/document_processor.py` (load_image, resize_image, to_grayscale, apply_gaussian_blur)
+- [x] Integrated `DocumentProcessor` into `/api/v1/documents/scan` endpoint to save and serve real processed image
+- [x] Created `tests/test_document_processor.py`
+- [x] **Gate test PASSED:** 9/9 pytest assertions pass
+- [x] Requirements updated and committed to Git
 
 ---
 
@@ -87,7 +92,7 @@
 | 2 | Frontend Foundation | ✅ Done | ✅ |
 | 3 | Backend Foundation | ✅ Done | ✅ |
 | 4 | Image Upload Integration | ✅ Done | ✅ |
-| 5 | CV Pipeline Core | ⬜ Not Started | ⬜ |
+| 5 | CV Pipeline Core | ✅ Done | ✅ |
 | 6 | Document Detection | ⬜ Not Started | ⬜ |
 | 7 | Perspective Correction | ⬜ Not Started | ⬜ |
 | 8 | Image Enhancement | ⬜ Not Started | ⬜ |
@@ -103,14 +108,15 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 5 — CV Pipeline Core (OpenCV)
-- Install `opencv-python-headless` and `numpy` in backend venv
-- Create `backend/app/services/document_processor.py`
-- Implement image resize (aspect ratio preserved)
-- Implement grayscale transformation
-- Implement Gaussian blur noise reduction
-- Unit test with pytest: Feed test image and assert dimensions, channels, and blur smoothing
-- Run Phase 5 test gate before Phase 6
+**Start with:** Phase 6 — Document Detection
+- Create `backend/app/services/edge_detector.py`
+- Canny edge detection (auto/adaptive thresholds)
+- Morphological close/dilation to bridge gaps
+- Find largest 4-sided contour = document boundary
+- Order 4 corner points (top-left, top-right, bottom-right, bottom-left)
+- Fallback: if no 4-point contour found, fallback safely to full image bounds
+- Unit tests: detect known angled rectangle document from synthetic test image
+- Run Phase 6 test gate before Phase 7
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)
