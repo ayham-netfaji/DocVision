@@ -1,6 +1,6 @@
+from datetime import UTC, datetime
+
 from pydantic import BaseModel, Field
-from typing import Optional
-from datetime import datetime, timezone
 
 
 class DocumentBase(BaseModel):
@@ -20,13 +20,13 @@ class DocumentScanResponse(BaseModel):
     document_id: str
     status: str = Field(default="completed", description="Status: completed, processing, failed")
     original_image_url: str
-    processed_image_url: Optional[str] = None
+    processed_image_url: str | None = None
     text: str
     confidence: float
-    word_count: Optional[int] = 0
-    character_count: Optional[int] = 0
-    stages: Optional[list[ProcessingStagePreview]] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    word_count: int | None = 0
+    character_count: int | None = 0
+    stages: list[ProcessingStagePreview] | None = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class DocumentErrorResponse(BaseModel):

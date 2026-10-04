@@ -2,16 +2,16 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.core.config import settings
-from app.db.session import engine, Base
 import app.db.models  # Ensure models are registered
+from app.api.routes.documents import router as documents_router
+from app.api.routes.export import router as export_router
+from app.api.routes.health import router as health_router
+from app.api.routes.ocr import router as ocr_router
+from app.core.config import settings
+from app.db.session import Base, engine
 
 # Initialize database schema tables
 Base.metadata.create_all(bind=engine)
-from app.api.routes.health import router as health_router
-from app.api.routes.documents import router as documents_router
-from app.api.routes.ocr import router as ocr_router
-from app.api.routes.export import router as export_router
 
 
 def create_app() -> FastAPI:

@@ -1,7 +1,7 @@
+from pathlib import Path
+
 import cv2
 import numpy as np
-from pathlib import Path
-from typing import Tuple, Union
 
 
 class DocumentProcessor:
@@ -16,7 +16,7 @@ class DocumentProcessor:
     def __init__(self, max_dimension: int = 1600):
         self.max_dimension = max_dimension
 
-    def load_image(self, image_source: Union[str, Path, bytes, np.ndarray]) -> np.ndarray:
+    def load_image(self, image_source: str | Path | bytes | np.ndarray) -> np.ndarray:
         """
         Loads an image from file path, raw bytes, or returns existing ndarray.
         Returns BGR numpy image array.
@@ -44,7 +44,7 @@ class DocumentProcessor:
 
         raise TypeError(f"Unsupported image source type: {type(image_source)}")
 
-    def resize_image(self, image: np.ndarray) -> Tuple[np.ndarray, float]:
+    def resize_image(self, image: np.ndarray) -> tuple[np.ndarray, float]:
         """
         Resizes the image if width or height exceeds max_dimension,
         maintaining the original aspect ratio.
@@ -72,7 +72,7 @@ class DocumentProcessor:
 
         return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    def apply_gaussian_blur(self, gray_image: np.ndarray, kernel_size: Tuple[int, int] = (5, 5), sigma_x: float = 0) -> np.ndarray:
+    def apply_gaussian_blur(self, gray_image: np.ndarray, kernel_size: tuple[int, int] = (5, 5), sigma_x: float = 0) -> np.ndarray:
         """
         Applies Gaussian blur to smooth high-frequency noise prior to edge detection.
         """
@@ -81,7 +81,7 @@ class DocumentProcessor:
         ky = kernel_size[1] if kernel_size[1] % 2 != 0 else kernel_size[1] + 1
         return cv2.GaussianBlur(gray_image, (kx, ky), sigma_x)
 
-    def preprocess_pipeline(self, image_source: Union[str, Path, bytes, np.ndarray]) -> dict:
+    def preprocess_pipeline(self, image_source: str | Path | bytes | np.ndarray) -> dict:
         """
         Executes Phase 5 pipeline stages sequentially:
         Original -> Resized -> Grayscale -> Blurred.

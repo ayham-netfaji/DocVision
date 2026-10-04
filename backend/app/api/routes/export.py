@@ -1,8 +1,6 @@
-import io
-from pathlib import Path
-from typing import Optional
-from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, Query
 from fastapi.responses import StreamingResponse
+
 from app.core.config import settings
 from app.services.pdf_exporter import PDFExporter
 
@@ -11,8 +9,8 @@ router = APIRouter()
 @router.get("/{document_id}/pdf")
 async def export_document_pdf(
     document_id: str,
-    text: Optional[str] = Query(None),
-    confidence: Optional[float] = Query(95.0)
+    text: str | None = Query(None),
+    confidence: float | None = Query(95.0)
 ):
     """
     Generates and streams a formatted PDF export for a processed document.

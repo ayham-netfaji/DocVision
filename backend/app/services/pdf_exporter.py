@@ -1,11 +1,15 @@
 import io
+import logging
 from pathlib import Path
-from typing import Optional
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, Table, TableStyle
+
 from PIL import Image as PILImage
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.platypus import Image as RLImage
+from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+logger = logging.getLogger(__name__)
 
 
 class PDFExporter:
@@ -20,7 +24,7 @@ class PDFExporter:
         document_id: str,
         text: str,
         confidence: float,
-        image_path: Optional[Path] = None
+        image_path: Path | None = None
     ) -> io.BytesIO:
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
@@ -80,8 +84,8 @@ class PDFExporter:
                 img_flowable = RLImage(str(image_path), width=target_width, height=target_height)
                 story.append(img_flowable)
                 story.append(Spacer(1, 15))
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning("Could not include image in PDF: %s", e)
 
         # 3. Section Heading
         section_style = ParagraphStyle(

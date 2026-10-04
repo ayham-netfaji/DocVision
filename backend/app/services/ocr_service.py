@@ -1,9 +1,10 @@
 import os
 import shutil
+from pathlib import Path
+from typing import Any
+
 import numpy as np
 import pytesseract
-from pathlib import Path
-from typing import Dict, Any, List
 
 
 class OCRService:
@@ -14,7 +15,7 @@ class OCRService:
     - Sanitizes and formats recognized text
     """
 
-    def __init__(self, tesseract_cmd: str = None):
+    def __init__(self, tesseract_cmd: str | None = None):
         self.tesseract_cmd = tesseract_cmd or self._find_tesseract_binary()
         if self.tesseract_cmd:
             pytesseract.pytesseract.tesseract_cmd = self.tesseract_cmd
@@ -48,7 +49,7 @@ class OCRService:
         except Exception:
             return False
 
-    def extract_text(self, image: np.ndarray, psm: int = 3, oem: int = 3) -> Dict[str, Any]:
+    def extract_text(self, image: np.ndarray, psm: int = 3, oem: int = 3) -> dict[str, Any]:
         """
         Extracts text and confidence scores using PyTesseract.
         Falls back cleanly with metadata if engine binary not configured.
@@ -69,8 +70,8 @@ class OCRService:
             # Extract detailed word-level data
             data = pytesseract.image_to_data(image, output_type=pytesseract.Output.DICT, config=config)
 
-            words: List[str] = []
-            confidences: List[float] = []
+            words: list[str] = []
+            confidences: list[float] = []
 
             n_boxes = len(data["text"])
             for i in range(n_boxes):
@@ -93,7 +94,7 @@ class OCRService:
             }
         except Exception as e:
             return {
-                "text": f"[OCR Error during extraction: {str(e)}]",
+                "text": f"[OCR Error during extraction: {e!s}]",
                 "confidence": 0.0,
                 "word_count": 0,
                 "character_count": 0,

@@ -1,11 +1,13 @@
 import uuid
-from fastapi import APIRouter, UploadFile, File, HTTPException, status, Depends
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
-from app.db.session import get_db
+
+from app.core.config import settings
 from app.db import crud
+from app.db.session import get_db
 from app.schemas.document import DocumentScanResponse, ProcessingStagePreview
 from app.utils.file_utils import validate_image_file
-from app.core.config import settings
 
 router = APIRouter()
 
@@ -16,12 +18,12 @@ async def scan_document(
 ):
     # 1. Validation
     ext = validate_image_file(image)
-    
+
     # 2. Unique document identifier
     doc_id = uuid.uuid4().hex[:12]
     filename = f"{doc_id}.{ext}"
     saved_path = settings.upload_dir / filename
-    
+
     # 3. Save file streaming with size limit checking
     total_size = 0
     try:
@@ -44,14 +46,15 @@ async def scan_document(
             saved_path.unlink()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process and store image: {str(e)}"
-        )
+            detail=f"Failed to process and store image: {e!s}"
+        ) from e
 
     # 4. Computer Vision Preprocessing (Phase 5)
+    import cv2
+
     from app.services.document_processor import DocumentProcessor
     from app.services.edge_detector import EdgeDetector
     from app.services.perspective import PerspectiveTransformer
-    import cv2
 
     processor = DocumentProcessor()
     pipeline_res = processor.preprocess_pipeline(saved_path)
@@ -59,7 +62,7 @@ async def scan_document(
     # 5. Document Boundary Detection (Phase 6)
     edge_detector = EdgeDetector()
     edges = edge_detector.detect_edges(pipeline_res["blurred"])
-    corners, detected = edge_detector.find_document_contour(edges, pipeline_res["resized"].shape)
+    corners, _detected = edge_detector.find_document_contour(edges, pipeline_res["resized"].shape)
 
     # Save Stage 1: Grayscale
     gray_filename = f"{doc_id}_stage1_gray.png"

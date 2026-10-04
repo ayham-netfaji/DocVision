@@ -1,7 +1,7 @@
 import numpy as np
-import cv2
-import pytest
+
 from app.services.ocr_service import OCRService
+
 
 def test_ocr_service_init():
     service = OCRService()

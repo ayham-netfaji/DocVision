@@ -1,6 +1,8 @@
 import numpy as np
 import pytest
+
 from app.services.document_processor import DocumentProcessor
+
 
 @pytest.fixture
 def sample_color_image():

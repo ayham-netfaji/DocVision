@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from app.schemas.ocr import OCRResponse
 
 router = APIRouter()
 

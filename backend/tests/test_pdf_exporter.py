@@ -1,6 +1,7 @@
 import io
-import pytest
+
 from app.services.pdf_exporter import PDFExporter
+
 
 def test_pdf_exporter_generates_bytes():
     exporter = PDFExporter()

@@ -1,5 +1,5 @@
+
 from pydantic import BaseModel, Field
-from typing import Optional, List
 
 
 class OCRBoundingBox(BaseModel):
@@ -17,4 +17,4 @@ class OCRResponse(BaseModel):
     confidence: float = Field(ge=0.0, le=100.0)
     word_count: int
     character_count: int
-    boxes: Optional[List[OCRBoundingBox]] = None
+    boxes: list[OCRBoundingBox] | None = None

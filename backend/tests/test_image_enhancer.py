@@ -1,7 +1,9 @@
-import numpy as np
 import cv2
+import numpy as np
 import pytest
+
 from app.services.image_enhancer import ImageEnhancer
+
 
 @pytest.fixture
 def shadowed_document():

@@ -1,7 +1,9 @@
-import numpy as np
 import cv2
+import numpy as np
 import pytest
+
 from app.services.edge_detector import EdgeDetector
+
 
 @pytest.fixture
 def document_image_fixture():

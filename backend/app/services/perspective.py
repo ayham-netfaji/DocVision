@@ -1,6 +1,6 @@
+
 import cv2
 import numpy as np
-from typing import Tuple
 
 
 class PerspectiveTransformer:
@@ -11,7 +11,7 @@ class PerspectiveTransformer:
     """
 
     @staticmethod
-    def calculate_dimensions(pts: np.ndarray) -> Tuple[int, int]:
+    def calculate_dimensions(pts: np.ndarray) -> tuple[int, int]:
         """
         Calculates maximum width and height for target transformed rectangle
         using Euclidean distance between corresponding corner pairs:

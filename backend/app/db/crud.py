@@ -1,5 +1,6 @@
+
 from sqlalchemy.orm import Session
-from typing import List, Optional
+
 from app.db.models import Document, OCRResult
 
 
@@ -8,7 +9,7 @@ def create_document_record(
     doc_id: str,
     filename: str,
     original_path: str,
-    processed_path: Optional[str] = None,
+    processed_path: str | None = None,
     text: str = "",
     confidence: float = 0.0,
     word_count: int = 0,
@@ -37,11 +38,11 @@ def create_document_record(
     return doc
 
 
-def get_all_documents(db: Session, limit: int = 50, offset: int = 0) -> List[Document]:
+def get_all_documents(db: Session, limit: int = 50, offset: int = 0) -> list[Document]:
     return db.query(Document).order_by(Document.created_at.desc()).offset(offset).limit(limit).all()
 
 
-def get_document_by_id(db: Session, doc_id: str) -> Optional[Document]:
+def get_document_by_id(db: Session, doc_id: str) -> Document | None:
     return db.query(Document).filter(Document.id == doc_id).first()
 
 

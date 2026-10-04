@@ -1,8 +1,10 @@
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from app.db.session import Base
+
 from app.db import crud
+from app.db.session import Base
+
 
 @pytest.fixture
 def test_db_session():

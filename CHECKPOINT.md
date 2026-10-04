@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 11 — Export (PDF & TXT) |
+| **Active Phase** | Phase 13 — Testing & Quality |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 12 — Database & History |
+| **Next Phase** | Phase 14 — Docker (Containerization) |
 | **Blockers** | None |
-| **Last Action** | ReportLab PDFExporter built, /api/v1/export/{id}/pdf endpoint streaming, 25/25 pytest passing |
+| **Last Action** | 29 pytest passed, 6 vitest passed, ruff and oxlint clean, OCR CER/WER evaluator verified |
 
 ---
 
@@ -125,8 +125,24 @@
 - [x] Added `GET /api/v1/export/{document_id}/pdf` streaming response endpoint
 - [x] Connected frontend `Result.tsx` toolbar with **Download PDF** and **Download TXT** buttons
 - [x] Created unit tests `tests/test_pdf_exporter.py` and API test `tests/test_export.py`
-- [x] **Gate test PASSED:** 25/25 pytest assertions pass, clean Vite production build
+**Phase 12 completed same session:**
+- [x] Configured SQLAlchemy with auto-table generation on startup
+- [x] Database models: `Document` (id, filename, image paths, timestamps) & `OCRResult` (text, confidence, counts) with cascade delete
+- [x] CRUD helper methods in `backend/app/db/crud.py`
+- [x] Scans automatically persist to database in `POST /api/v1/documents/scan`
+- [x] Added `GET /api/v1/documents`, `GET /api/v1/documents/{id}`, and `DELETE /api/v1/documents/{id}`
+- [x] Frontend `History.tsx` connects live to DB: keyword search, confidence chips, thumbnails, view in Result, delete
+- [x] Created `tests/test_db.py`
+- [x] **Gate test PASSED:** 26/26 pytest assertions pass, Vite build passes cleanly
 - [x] Committed to Git repository
+**Phase 13 completed same session:**
+- [x] Created `backend/app/services/ocr_evaluator.py` (CER, WER, accuracy metrics, raw vs processed benchmark)
+- [x] Pytest suite expanded to 29 tests (`tests/test_ocr_evaluator.py` included)
+- [x] Configured `backend/pyproject.toml` and ran Ruff linter cleanly across all backend modules and tests
+- [x] Set up Vitest and React Testing Library in `frontend` (`vite.config.ts`, `setup.ts`, `package.json`)
+- [x] Created unit tests for `UploadZone` (4 tests) and `ProcessingStatus` (2 tests), 6/6 vitest assertions passing
+- [x] Frontend oxlint clean, TypeScript production build verified (`tsc -b && vite build`)
+- [x] **Gate test PASSED:** 29 backend tests passing, 6 frontend tests passing, linters clean
 
 ---
 
@@ -146,23 +162,20 @@
 | 9 | OCR Integration | ✅ Done | ✅ |
 | 10 | Result UI | ✅ Done | ✅ |
 | 11 | Export | ✅ Done | ✅ |
-| 12 | Database & History | ⬜ Not Started | ⬜ |
-| 13 | Testing & Quality | ⬜ Not Started | ⬜ |
-| 14 | Docker | ⬜ Not Started | ⬜ |
+| 12 | Database & History | ✅ Done | ✅ |
+| 13 | Testing & Quality | ✅ Done | ✅ |
+| 14 | Docker | ⬜ In Progress | ⬜ |
 | 15 | CI/CD & Deployment | ⬜ Not Started | ⬜ |
 
 ---
 
 ## Context for Next Session
 
-**Start with:** Phase 12 — Database & History
-- Install `SQLAlchemy` and SQLite / PostgreSQL driver (using SQLite default with zero-config setup for seamless local run and testing, PostgreSQL URL configurable via env)
-- Create database models: `DocumentModel`, `OCRResultModel` in `backend/app/db/models.py`
-- Session management in `backend/app/db/session.py`
-- CRUD operations in `backend/app/db/crud.py`
-- List documents endpoint `GET /api/v1/documents`, get doc `GET /api/v1/documents/{id}`, delete `DELETE /api/v1/documents/{id}`
-- Connect frontend `History.tsx` to display real scan history with thumbnails, stats, and delete actions
-- Run Phase 12 test gate before Phase 13
+**Start with:** Phase 14 — Docker (Containerization)
+- `backend/Dockerfile` with Python 3.11/3.12, libgl1, tesseract-ocr, tesseract-ocr-eng
+- `frontend/Dockerfile` multi-stage build (Node builder + Nginx Alpine static serving with reverse proxy)
+- `docker-compose.yml` orchestrating frontend, backend, and PostgreSQL services with shared volumes and network
+- Verify Docker configuration syntax and healthchecks
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

@@ -1,6 +1,6 @@
+
 import cv2
 import numpy as np
-from typing import Optional, Tuple
 
 
 class EdgeDetector:
@@ -56,7 +56,7 @@ class EdgeDetector:
 
         return rect
 
-    def find_document_contour(self, edge_image: np.ndarray, original_shape: Tuple[int, ...]) -> Tuple[np.ndarray, bool]:
+    def find_document_contour(self, edge_image: np.ndarray, original_shape: tuple[int, ...]) -> tuple[np.ndarray, bool]:
         """
         Finds the largest 4-sided contour corresponding to the document boundary.
         Returns (ordered_4_corners, is_detected).

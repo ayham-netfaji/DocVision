@@ -49,7 +49,7 @@ export const HistoryPage: React.FC = () => {
     try {
       await deleteDocumentById(id);
       setDocuments((prev) => prev.filter((d) => d.document_id !== id));
-    } catch (err) {
+    } catch {
       alert('Failed to delete document.');
     }
   };

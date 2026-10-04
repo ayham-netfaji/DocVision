@@ -1,6 +1,9 @@
-from fastapi import HTTPException, UploadFile, status
 from pathlib import Path
+
+from fastapi import HTTPException, UploadFile, status
+
 from app.core.config import settings
+
 
 def validate_image_file(file: UploadFile) -> str:
     """
