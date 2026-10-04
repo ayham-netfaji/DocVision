@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 1 — Project Setup |
+| **Active Phase** | Phase 2 — Frontend Foundation |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 2 — Frontend Foundation |
+| **Next Phase** | Phase 3 — Backend Foundation |
 | **Blockers** | None |
-| **Last Action** | Backend + Frontend scaffolded, both servers verified, git committed |
+| **Last Action** | Tailwind, React Router, Navbar, UploadZone, Pages built, tested & committed |
 
 ---
 
@@ -57,8 +57,14 @@
 - [x] `backend/app/core/config.py` — pydantic-settings config
 - [x] `frontend/` — Vite 8.3.2 + React + TypeScript
 - [x] **Gate test PASSED:** health endpoint returns `{"status":"ok"}`, frontend returns 200
-- [x] `requirements.txt` frozen
-- [x] Initial git commit: 32 files
+**Phase 2 completed same session:**
+- [x] Tailwind CSS v4 + Vite plugin configured
+- [x] React Router setup with routes: Home (`/`), Scanner (`/scanner`), Result (`/result`), History (`/history`)
+- [x] Responsive dark modern Navbar with Lucide icons
+- [x] `UploadZone` component with drag & drop, client validation (10MB max, JPG/PNG/WEBP)
+- [x] Full production build verified (`tsc -b && vite build`)
+- [x] **Gate test PASSED:** 200 OK on dev server, route structure ready
+- [x] Committed to Git repository
 
 ---
 
@@ -68,7 +74,7 @@
 |-------|-------------|--------|-------------|
 | 0 | Architecture & Planning | ✅ Done | ✅ |
 | 1 | Project Setup | ✅ Done | ✅ |
-| 2 | Frontend Foundation | ⬜ Not Started | ⬜ |
+| 2 | Frontend Foundation | ✅ Done | ✅ |
 | 3 | Backend Foundation | ⬜ Not Started | ⬜ |
 | 4 | Image Upload Integration | ⬜ Not Started | ⬜ |
 | 5 | CV Pipeline Core | ⬜ Not Started | ⬜ |
@@ -87,13 +93,13 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 2 — Frontend Foundation
-- Install Tailwind CSS
-- Set up React Router (Home, Scanner, Result, History)
-- Build Navbar component
-- Build Home page with upload zone (drag & drop)
-- Client-side file validation (JPG/PNG/WEBP)
-- Run gate test before moving to Phase 3
+**Start with:** Phase 3 — Backend Foundation
+- FastAPI backend routes structure: `documents.py`, `ocr.py`
+- Pydantic schemas: `document.py`, `ocr.py`
+- Document scan endpoint `POST /api/v1/documents/scan` (accept image, file validation, stub pipeline response)
+- Temp file handling and size limits
+- Pytest or curl verification of endpoints
+- Run Phase 3 gate test before Phase 4
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

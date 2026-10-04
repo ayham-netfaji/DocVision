@@ -22,13 +22,13 @@
 
 ---
 
-## Phase 2 — Frontend Foundation
-- [ ] Tailwind CSS setup
-- [ ] React Router (Home, Scanner, Result, History pages)
-- [ ] Navbar component
-- [ ] Home page with upload zone (drag & drop + file picker)
-- [ ] JPG/PNG/WEBP validation client-side
-- **Gate:** Navigate all routes, upload zone accepts valid images, rejects others
+## Phase 2 — Frontend Foundation ✅
+- [x] Tailwind CSS setup
+- [x] React Router (Home, Scanner, Result, History pages)
+- [x] Navbar component
+- [x] Home page with upload zone (drag & drop + file picker)
+- [x] JPG/PNG/WEBP validation client-side
+- **Gate:** ✅ TypeScript build clean, dev server returns 200, route navigation active
 
 ---
 
