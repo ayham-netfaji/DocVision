@@ -1,0 +1,62 @@
+services:
+  # ---------------------------------------------
+  # PostgreSQL Database Service
+  # ---------------------------------------------
+  db:
+    image: postgres:16-alpine
+    container_name: docvision-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: docvision
+      POSTGRES_PASSWORD: docvision_pass
+      POSTGRES_DB: docvision
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docvision -d docvision"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------
+  # FastAPI Computer Vision & OCR Backend
+  # ---------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: docvision-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      DOCVISION_DATABASE_URL: postgresql://docvision:docvision_pass@db:5432/docvision
+      DOCVISION_CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://localhost:80","http://localhost"]'
+      DOCVISION_UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------
+  # React + Vite + Nginx Frontend
+  # ---------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: docvision-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+    driver: local
+  uploads_data:
+    driver: local

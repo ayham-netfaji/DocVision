@@ -1,0 +1,102 @@
+name: DocVision CI Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  # ==========================================
+  # Backend Quality Gate: Linting & Unit Tests
+  # ==========================================
+  backend-quality:
+    name: Backend Lint & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install system dependencies (OpenCV & Tesseract OCR)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            tesseract-ocr \
+            tesseract-ocr-eng \
+            libgl1 \
+            libglib2.0-0
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Run Ruff Linter
+        working-directory: ./backend
+        run: ruff check app tests
+
+      - name: Run Pytest Test Suite
+        working-directory: ./backend
+        run: pytest -v
+
+  # ==========================================
+  # Frontend Quality Gate: Lint, Tests & Build
+  # ==========================================
+  frontend-quality:
+    name: Frontend Lint, Tests & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run Oxlint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run Vitest Unit Tests
+        working-directory: ./frontend
+        run: npm run test
+
+      - name: Run Production Build
+        working-directory: ./frontend
+        run: npm run build
+
+  # ==========================================
+  # Docker Compose & Container Verification
+  # ==========================================
+  docker-validation:
+    name: Docker Containerization Build
+    needs: [backend-quality, frontend-quality]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: docker compose config --quiet
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Compose Images
+        run: docker compose build
