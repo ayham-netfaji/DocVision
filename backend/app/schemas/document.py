@@ -9,6 +9,13 @@ class DocumentBase(BaseModel):
     size_bytes: int
 
 
+class ProcessingStagePreview(BaseModel):
+    id: str
+    name: str
+    description: str
+    image_url: str
+
+
 class DocumentScanResponse(BaseModel):
     document_id: str
     status: str = Field(default="completed", description="Status: completed, processing, failed")
@@ -16,6 +23,9 @@ class DocumentScanResponse(BaseModel):
     processed_image_url: Optional[str] = None
     text: str
     confidence: float
+    word_count: Optional[int] = 0
+    character_count: Optional[int] = 0
+    stages: Optional[list[ProcessingStagePreview]] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 

@@ -64,6 +64,21 @@ async def scan_document(
     edges = edge_detector.detect_edges(pipeline_res["blurred"])
     corners, detected = edge_detector.find_document_contour(edges, pipeline_res["resized"].shape)
 
+    # Save Stage 1: Grayscale
+    gray_filename = f"{doc_id}_stage1_gray.png"
+    cv2.imwrite(str(settings.upload_dir / gray_filename), pipeline_res["grayscale"])
+
+    # Save Stage 2: Canny Edges
+    edge_filename = f"{doc_id}_stage2_edges.png"
+    cv2.imwrite(str(settings.upload_dir / edge_filename), edges)
+
+    # Save Stage 3: Contour Quad Outline
+    contour_preview = pipeline_res["resized"].copy()
+    pts = corners.astype(int).reshape((-1, 1, 2))
+    cv2.polylines(contour_preview, [pts], isClosed=True, color=(0, 255, 0), thickness=3)
+    contour_filename = f"{doc_id}_stage3_contour.png"
+    cv2.imwrite(str(settings.upload_dir / contour_filename), contour_preview)
+
     # 6. Perspective Correction / Homography Warp (Phase 7)
     transformer = PerspectiveTransformer()
     original_img = processor.load_image(saved_path)
@@ -72,10 +87,13 @@ async def scan_document(
         corners,
         scale_ratio=pipeline_res["ratio"]
     )
+    warped_filename = f"{doc_id}_stage4_warped.png"
+    cv2.imwrite(str(settings.upload_dir / warped_filename), warped_doc)
 
     # 7. Image Enhancement (Phase 8)
     from app.services.image_enhancer import ImageEnhancer
     from app.services.ocr_service import OCRService
+    from app.schemas.document import ProcessingStagePreview
 
     enhancer = ImageEnhancer()
     enhanced_doc = enhancer.enhance(warped_doc, mode="scan_bw")
@@ -90,10 +108,45 @@ async def scan_document(
 
     extracted_text = ocr_result.get("text", "")
     confidence = ocr_result.get("confidence", 95.0)
+    word_count = ocr_result.get("word_count", 0)
+    char_count = ocr_result.get("character_count", 0)
 
     if not extracted_text:
         extracted_text = "[No text detected in document image]"
         confidence = 0.0
+
+    stages = [
+        ProcessingStagePreview(
+            id="1",
+            name="Grayscale & Normalization",
+            description="Normalized single channel representation",
+            image_url=f"/uploads/{gray_filename}"
+        ),
+        ProcessingStagePreview(
+            id="2",
+            name="Canny Edge Detection",
+            description="High-intensity gradients and edge maps",
+            image_url=f"/uploads/{edge_filename}"
+        ),
+        ProcessingStagePreview(
+            id="3",
+            name="4-Point Boundary Detection",
+            description="Convex polygon isolation of document boundaries",
+            image_url=f"/uploads/{contour_filename}"
+        ),
+        ProcessingStagePreview(
+            id="4",
+            name="Perspective Rectification",
+            description="Homography transformation flattening document top-down",
+            image_url=f"/uploads/{warped_filename}"
+        ),
+        ProcessingStagePreview(
+            id="5",
+            name="Enhanced B&W Scan",
+            description="CLAHE shadow removal & adaptive thresholding for OCR",
+            image_url=f"/uploads/{processed_filename}"
+        ),
+    ]
 
     # 9. Complete Response
     return DocumentScanResponse(
@@ -102,7 +155,10 @@ async def scan_document(
         original_image_url=f"/uploads/{filename}",
         processed_image_url=f"/uploads/{processed_filename}",
         text=extracted_text,
-        confidence=confidence
+        confidence=confidence,
+        word_count=word_count,
+        character_count=char_count,
+        stages=stages
     )
 
 @router.get("/{document_id}")

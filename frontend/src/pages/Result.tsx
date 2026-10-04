@@ -1,6 +1,16 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { ArrowLeft, Copy, Check, Download, CheckCircle2, Hash, Percent } from 'lucide-react';
+import {
+  ArrowLeft,
+  Copy,
+  Check,
+  Download,
+  CheckCircle2,
+  Hash,
+  Percent,
+  Layers,
+  FileText
+} from 'lucide-react';
 import type { ProcessedDocument } from '../types/document';
 
 export const Result: React.FC = () => {
@@ -9,15 +19,30 @@ export const Result: React.FC = () => {
 
   const previewUrl = location.state?.previewUrl || sessionStorage.getItem('docvision_preview_url');
   const result = location.state?.result as ProcessedDocument | undefined;
-  
+
+  const [activeTab, setActiveTab] = useState<'scan' | 'stages'>('scan');
+  const [copied, setCopied] = useState(false);
+  const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>('sm');
+
+  const backendHost = import.meta.env.VITE_BACKEND_HOST || 'http://127.0.0.1:8000';
+
+  const processedImageUrl = result?.processed_image_url
+    ? `${backendHost}${result.processed_image_url}`
+    : previewUrl;
+
+  const originalImageUrl = result?.original_image_url
+    ? `${backendHost}${result.original_image_url}`
+    : previewUrl;
+
   const extractedText = result?.text || `[Default Preview]
 Document scanner pipeline ready.
-Scan your document from the Workspace to see live OCR text extraction.`;
+Scan your document from Workspace to see live OCR text extraction.`;
 
   const confidence = result?.confidence ?? 98.5;
   const docId = result?.document_id ?? 'preview-doc';
-
-  const [copied, setCopied] = useState(false);
+  const wordCount = result?.word_count ?? extractedText.split(/\s+/).filter(Boolean).length;
+  const charCount = result?.character_count ?? extractedText.length;
+  const stages = result?.stages || [];
 
   const handleCopy = () => {
     navigator.clipboard.writeText(extractedText);
@@ -36,8 +61,9 @@ Scan your document from the Workspace to see live OCR text extraction.`;
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      {/* Top Header Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <button
           onClick={() => navigate('/scanner')}
           className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -46,7 +72,7 @@ Scan your document from the Workspace to see live OCR text extraction.`;
           <span>Back to Workspace</span>
         </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs bg-slate-800 text-slate-300 border border-slate-700/80 px-3 py-1.5 rounded-full">
             <Hash className="w-3.5 h-3.5 text-blue-400" />
             <span>ID: {docId}</span>
@@ -54,63 +80,177 @@ Scan your document from the Workspace to see live OCR text extraction.`;
 
           <div className="flex items-center gap-1.5 text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded-full">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Status: {result?.status || 'Active'}</span>
+            <span>Pipeline: Complete</span>
+          </div>
+
+          <div className="flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-3 py-1.5 rounded-full">
+            <Percent className="w-3.5 h-3.5" />
+            <span>Confidence: {confidence}%</span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Scanned/Enhanced Document View */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col">
-          <h3 className="text-base font-semibold text-white mb-4">Input Document Image</h3>
-          <div className="flex-1 min-h-[360px] bg-slate-950/60 border border-slate-800/80 rounded-xl flex items-center justify-center p-4 overflow-hidden">
-            {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt="Scanned Preview"
-                className="max-h-[460px] w-auto object-contain rounded shadow-lg"
-              />
-            ) : (
-              <div className="text-sm text-slate-500">No document processed</div>
-            )}
-          </div>
-        </div>
+      {/* Mode Navigation Tabs */}
+      <div className="flex items-center gap-2 mb-8 border-b border-slate-800 pb-3">
+        <button
+          onClick={() => setActiveTab('scan')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
+            activeTab === 'scan'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <FileText className="w-4 h-4" />
+          <span>Extracted Text & Document</span>
+        </button>
 
-        {/* OCR Result View */}
-        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-base font-semibold text-white">Extracted Text</h3>
-              <div className="flex items-center gap-1 text-xs text-blue-400 mt-1">
-                <Percent className="w-3 h-3" />
-                <span>Confidence: {confidence}%</span>
+        <button
+          onClick={() => setActiveTab('stages')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
+            activeTab === 'stages'
+              ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20'
+              : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Show Processing (Academic CV Demo)</span>
+          {stages.length > 0 && (
+            <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-slate-900 border border-slate-700 text-slate-300">
+              {stages.length} Stages
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'scan' ? (
+        /* Primary Split View: Document vs OCR Text */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Enhanced Document Scan */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-semibold text-white">Enhanced Document Scan</h3>
+              <span className="text-xs text-slate-400">Deskewed & Binarized</span>
+            </div>
+
+            <div className="flex-1 min-h-[420px] bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-center p-4 overflow-hidden relative group">
+              {processedImageUrl ? (
+                <img
+                  src={processedImageUrl}
+                  alt="Enhanced Document Scan"
+                  className="max-h-[500px] w-auto object-contain rounded shadow-2xl"
+                />
+              ) : (
+                <div className="text-sm text-slate-500">No document processed</div>
+              )}
+            </div>
+          </div>
+
+          {/* OCR Extracted Text Pane */}
+          <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 flex flex-col">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div>
+                <h3 className="text-base font-semibold text-white">Extracted Digital Text</h3>
+                <div className="flex items-center gap-3 text-xs text-slate-400 mt-1">
+                  <span>{wordCount} words</span>
+                  <span>&bull;</span>
+                  <span>{charCount} characters</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {/* Font Size Selector */}
+                <div className="flex items-center bg-slate-800/80 border border-slate-700 rounded-lg p-0.5 text-xs">
+                  <button
+                    onClick={() => setFontSize('sm')}
+                    className={`px-2 py-1 rounded cursor-pointer ${fontSize === 'sm' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    S
+                  </button>
+                  <button
+                    onClick={() => setFontSize('base')}
+                    className={`px-2 py-1 rounded cursor-pointer ${fontSize === 'base' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    M
+                  </button>
+                  <button
+                    onClick={() => setFontSize('lg')}
+                    className={`px-2 py-1 rounded cursor-pointer ${fontSize === 'lg' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                  >
+                    L
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleCopy}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition border border-slate-700 cursor-pointer"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copied' : 'Copy'}</span>
+                </button>
+
+                <button
+                  onClick={handleDownload}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download TXT</span>
+                </button>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleCopy}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition border border-slate-700 cursor-pointer"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copied' : 'Copy'}</span>
-              </button>
-
-              <button
-                onClick={handleDownload}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Download TXT</span>
-              </button>
+            <div
+              className={`flex-1 min-h-[420px] bg-slate-950/90 border border-slate-800 rounded-xl p-5 font-mono text-slate-200 overflow-auto whitespace-pre-wrap leading-relaxed shadow-inner ${
+                fontSize === 'sm' ? 'text-xs' : fontSize === 'base' ? 'text-sm' : 'text-base'
+              }`}
+            >
+              {extractedText}
             </div>
           </div>
+        </div>
+      ) : (
+        /* Academic CV Showcase: All Computer Vision Stages */
+        <div className="space-y-8">
+          <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6">
+            <h3 className="text-lg font-bold text-white mb-1">Academic CV Pipeline Decomposition</h3>
+            <p className="text-sm text-slate-400">
+              Visualizes step-by-step mathematical transformations from camera input to clean binarized machine characters.
+            </p>
+          </div>
 
-          <div className="flex-1 min-h-[360px] bg-slate-950/80 border border-slate-800 rounded-xl p-4 font-mono text-xs text-slate-200 overflow-auto whitespace-pre-wrap leading-relaxed shadow-inner">
-            {extractedText}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Raw Input Card */}
+            <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col">
+              <span className="text-xs font-semibold text-blue-400 mb-1">Step 0 &bull; Input</span>
+              <h4 className="text-sm font-medium text-white mb-3">Original Capture</h4>
+              <div className="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 p-2 min-h-[220px] flex items-center justify-center overflow-hidden">
+                {originalImageUrl ? (
+                  <img src={originalImageUrl} alt="Original" className="max-h-[220px] w-auto object-contain rounded" />
+                ) : (
+                  <span className="text-xs text-slate-600">No original image</span>
+                )}
+              </div>
+            </div>
+
+            {/* Generated Intermediate Pipeline Stages */}
+            {stages.map((stage, idx) => (
+              <div key={stage.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col">
+                <span className="text-xs font-semibold text-indigo-400 mb-1">
+                  Step {idx + 1} &bull; OpenCV
+                </span>
+                <h4 className="text-sm font-medium text-white mb-1">{stage.name}</h4>
+                <p className="text-xs text-slate-400 mb-3">{stage.description}</p>
+                <div className="flex-1 bg-slate-950 rounded-xl border border-slate-800/80 p-2 min-h-[220px] flex items-center justify-center overflow-hidden">
+                  <img
+                    src={`${backendHost}${stage.image_url}`}
+                    alt={stage.name}
+                    className="max-h-[220px] w-auto object-contain rounded"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 8 — Image Enhancement |
+| **Active Phase** | Phase 9 — OCR Integration |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 9 — OCR Integration |
+| **Next Phase** | Phase 10 — Result UI & "Show Processing" Demo |
 | **Blockers** | None |
-| **Last Action** | ImageEnhancer service built with CLAHE, adaptive thresholding & sharpening (19/19 pytest passed) |
+| **Last Action** | OCRService built, end-to-end CV+OCR pipeline wired, 22/22 pytest passing |
 
 ---
 
@@ -102,7 +102,13 @@
 - [x] Configurable presets: `scan_bw`, `grayscale`, `enhanced_color`
 - [x] Integrated into scan route: outputs clean binarized black-on-white image ready for OCR
 - [x] Created `tests/test_image_enhancer.py`
-- [x] **Gate test PASSED:** 19/19 pytest assertions pass
+**Phase 9 completed same session:**
+- [x] Installed `pytesseract` and dependencies
+- [x] Created `backend/app/services/ocr_service.py` with multi-path binary resolution and graceful fallback
+- [x] Integrated OCR text and word-level confidence calculation into `/api/v1/documents/scan`
+- [x] Full end-to-end pipeline active: Upload -> Resize -> Grayscale -> Blur -> Canny -> 4-Point Homography Warp -> CLAHE & Adaptive Binarization -> Tesseract OCR
+- [x] Created `tests/test_ocr_service.py`
+- [x] **Gate test PASSED:** 22/22 pytest assertions pass across all test modules
 - [x] Committed to Git repository
 
 ---
@@ -120,7 +126,7 @@
 | 6 | Document Detection | ✅ Done | ✅ |
 | 7 | Perspective Correction | ✅ Done | ✅ |
 | 8 | Image Enhancement | ✅ Done | ✅ |
-| 9 | OCR Integration | ⬜ Not Started | ⬜ |
+| 9 | OCR Integration | ✅ Done | ✅ |
 | 10 | Result UI | ⬜ Not Started | ⬜ |
 | 11 | Export | ⬜ Not Started | ⬜ |
 | 12 | Database & History | ⬜ Not Started | ⬜ |
@@ -132,14 +138,12 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 9 — OCR Integration
-- Check Tesseract binary availability in Windows environment / path or fallback engine
-- Install `pytesseract` in backend virtualenv
-- Create `backend/app/services/ocr_service.py`
-- Extract raw text and confidence scores (`image_to_data` / `image_to_string`)
-- Wire full end-to-end pipeline: Upload -> Resize -> Gray/Blur -> Canny Contours -> 4-Point Homography -> Enhancement -> Tesseract OCR -> Real Text Response
-- Unit test: run OCR on synthetic text image fixture and verify recognized words
-- Run Phase 9 test gate before Phase 10
+**Start with:** Phase 10 — Result UI & "Show Processing" Demo
+- Update frontend `Result.tsx` with side-by-side view comparing original upload vs warped/enhanced scan
+- Add "Show Processing" academic CV showcase mode: display pipeline stages step-by-step (Original -> Grayscale -> Canny Edges -> Perspective Warp -> Enhanced B&W -> OCR Result)
+- Character & word counter statistics badges
+- Text font size / zoom adjustments in text reader
+- Run Phase 10 test gate before Phase 11
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)
