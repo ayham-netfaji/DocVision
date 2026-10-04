@@ -92,13 +92,14 @@
 
 ---
 
-## Phase 10 — Result UI
-- [ ] Result page: side-by-side processed image + extracted text
-- [ ] OCR confidence display
-- [ ] Copy text button
-- [ ] Download TXT button
-- [ ] "Show Processing" demo view (all CV stages displayed)
-- **Gate:** Full end-to-end: upload → scan → see result with text, copy/download work
+## Phase 10 — Result UI ✅
+- [x] Result page: side-by-side processed image + extracted text
+- [x] OCR confidence, word count & character count display
+- [x] Copy text button
+- [x] Download TXT button
+- [x] "Show Processing" demo view (all CV stages decomposed: Grayscale, Canny, 4-Point Quad, Homography Warp, Enhanced B&W)
+- [x] Text reader font size adjustment (S/M/L)
+- **Gate:** ✅ Full end-to-end: upload → scan → see result with text, copy/download work, academic CV stages showcase verified
 
 ---
 

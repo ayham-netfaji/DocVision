@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 9 — OCR Integration |
+| **Active Phase** | Phase 10 — Result UI & "Show Processing" Demo |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 10 — Result UI & "Show Processing" Demo |
+| **Next Phase** | Phase 11 — Export (PDF & TXT) |
 | **Blockers** | None |
-| **Last Action** | OCRService built, end-to-end CV+OCR pipeline wired, 22/22 pytest passing |
+| **Last Action** | Result UI expanded with Academic CV stages decomposition, font zoom, stats, copy & download |
 
 ---
 
@@ -108,7 +108,18 @@
 - [x] Integrated OCR text and word-level confidence calculation into `/api/v1/documents/scan`
 - [x] Full end-to-end pipeline active: Upload -> Resize -> Grayscale -> Blur -> Canny -> 4-Point Homography Warp -> CLAHE & Adaptive Binarization -> Tesseract OCR
 - [x] Created `tests/test_ocr_service.py`
-- [x] **Gate test PASSED:** 22/22 pytest assertions pass across all test modules
+**Phase 10 completed same session:**
+- [x] Result page upgraded with Extracted Text viewer and side-by-side scan comparison
+- [x] Built **"Show Processing" Academic CV Showcase Tab** decomposing pipeline stages:
+  1. Grayscale & Normalization
+  2. Canny Edge Detection
+  3. 4-Point Boundary Detection (green polygon)
+  4. Perspective Rectification (deskewed)
+  5. Enhanced B&W Scan (CLAHE + Adaptive Binarization)
+- [x] Text reader font size selector (S / M / L)
+- [x] Character count, word count, and confidence percentage badges
+- [x] Copy to clipboard & TXT download functionality
+- [x] Clean production build verified (`tsc -b && vite build`)
 - [x] Committed to Git repository
 
 ---
@@ -127,7 +138,7 @@
 | 7 | Perspective Correction | ✅ Done | ✅ |
 | 8 | Image Enhancement | ✅ Done | ✅ |
 | 9 | OCR Integration | ✅ Done | ✅ |
-| 10 | Result UI | ⬜ Not Started | ⬜ |
+| 10 | Result UI | ✅ Done | ✅ |
 | 11 | Export | ⬜ Not Started | ⬜ |
 | 12 | Database & History | ⬜ Not Started | ⬜ |
 | 13 | Testing & Quality | ⬜ Not Started | ⬜ |
@@ -138,12 +149,12 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 10 — Result UI & "Show Processing" Demo
-- Update frontend `Result.tsx` with side-by-side view comparing original upload vs warped/enhanced scan
-- Add "Show Processing" academic CV showcase mode: display pipeline stages step-by-step (Original -> Grayscale -> Canny Edges -> Perspective Warp -> Enhanced B&W -> OCR Result)
-- Character & word counter statistics badges
-- Text font size / zoom adjustments in text reader
-- Run Phase 10 test gate before Phase 11
+**Start with:** Phase 11 — Export (PDF)
+- Add PDF export backend endpoint using ReportLab (`GET /api/v1/documents/{id}/pdf`)
+- Bundle processed document image, extracted text, and confidence header into clean formatted PDF
+- Add Download PDF button in frontend `Result.tsx`
+- Unit test: verify PDF generation and headers
+- Run Phase 11 test gate before Phase 12
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

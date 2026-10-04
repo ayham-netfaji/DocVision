@@ -60,6 +60,15 @@ Scan your document from Workspace to see live OCR text extraction.`;
     URL.revokeObjectURL(url);
   };
 
+  const handleDownloadPDF = () => {
+    const pdfUrl = `${backendHost}/api/v1/export/${docId}/pdf?confidence=${confidence}&text=${encodeURIComponent(extractedText)}`;
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `DocVision_${docId}.pdf`;
+    link.target = '_blank';
+    link.click();
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       {/* Top Header Bar */}
@@ -190,10 +199,18 @@ Scan your document from Workspace to see live OCR text extraction.`;
 
                 <button
                   onClick={handleDownload}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg transition border border-slate-700 cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Download TXT</span>
+                  <span>TXT</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition shadow-md shadow-blue-600/20 cursor-pointer font-medium"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download PDF</span>
                 </button>
               </div>
             </div>
