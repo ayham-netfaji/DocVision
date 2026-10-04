@@ -13,12 +13,12 @@
 
 ---
 
-## Phase 1 — Project Setup
-- [ ] Init Git repo + `.gitignore`
-- [ ] Create `backend/` with Python venv, FastAPI, Uvicorn
-- [ ] Create `frontend/` with Vite + React + TypeScript
-- [ ] Verify both servers start (health endpoint + dev page)
-- **Gate:** `GET /api/v1/health` returns `{"status":"ok"}`, React dev page loads
+## Phase 1 — Project Setup ✅
+- [x] Init Git repo + `.gitignore`
+- [x] Create `backend/` with Python venv, FastAPI, Uvicorn
+- [x] Create `frontend/` with Vite + React + TypeScript
+- [x] Verify both servers start (health endpoint + dev page)
+- **Gate:** ✅ `GET /api/v1/health` returns `{"status":"ok"}`, React dev page returns 200
 
 ---
 

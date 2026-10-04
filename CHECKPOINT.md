@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 0 — Architecture & Planning |
+| **Active Phase** | Phase 1 — Project Setup |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 1 — Project Setup |
+| **Next Phase** | Phase 2 — Frontend Foundation |
 | **Blockers** | None |
-| **Last Action** | Analyzed report, created ROADMAP.md + CHECKPOINT.md |
+| **Last Action** | Backend + Frontend scaffolded, both servers verified, git committed |
 
 ---
 
@@ -48,6 +48,18 @@
 - `ROADMAP.md` — master roadmap with gates
 - `CHECKPOINT.md` — this file
 
+**Phase 1 completed same session:**
+- [x] Git repo initialized
+- [x] `.gitignore` created (Python + Node + IDE + OS)
+- [x] `backend/` — Python 3.14.4 venv, FastAPI 0.142.2, Uvicorn, Pydantic, Pillow
+- [x] `backend/app/main.py` — app factory with CORS
+- [x] `backend/app/api/routes/health.py` — health endpoint
+- [x] `backend/app/core/config.py` — pydantic-settings config
+- [x] `frontend/` — Vite 8.3.2 + React + TypeScript
+- [x] **Gate test PASSED:** health endpoint returns `{"status":"ok"}`, frontend returns 200
+- [x] `requirements.txt` frozen
+- [x] Initial git commit: 32 files
+
 ---
 
 ## Phase Completion Tracker
@@ -55,7 +67,7 @@
 | Phase | Description | Status | Gate Passed |
 |-------|-------------|--------|-------------|
 | 0 | Architecture & Planning | ✅ Done | ✅ |
-| 1 | Project Setup | ⬜ Not Started | ⬜ |
+| 1 | Project Setup | ✅ Done | ✅ |
 | 2 | Frontend Foundation | ⬜ Not Started | ⬜ |
 | 3 | Backend Foundation | ⬜ Not Started | ⬜ |
 | 4 | Image Upload Integration | ⬜ Not Started | ⬜ |
@@ -75,11 +87,16 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 1 — Project Setup
-- Init git repo
-- Create `backend/` with FastAPI
-- Create `frontend/` with Vite + React + TS
-- Verify health endpoint + dev server
-- Run gate test before moving to Phase 2
+**Start with:** Phase 2 — Frontend Foundation
+- Install Tailwind CSS
+- Set up React Router (Home, Scanner, Result, History)
+- Build Navbar component
+- Build Home page with upload zone (drag & drop)
+- Client-side file validation (JPG/PNG/WEBP)
+- Run gate test before moving to Phase 3
+
+**Servers:**
+- Backend: `uvicorn app.main:app` from `backend/` (port 8000)
+- Frontend: `npm run dev` from `frontend/` (port 5173)
 
 **Read this file first every new session.**
