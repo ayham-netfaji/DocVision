@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 6 — Document Detection |
+| **Active Phase** | Phase 7 — Perspective Correction |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 7 — Perspective Correction |
+| **Next Phase** | Phase 8 — Image Enhancement |
 | **Blockers** | None |
-| **Last Action** | EdgeDetector service built, 4-corner polygon detection + fallback verified (12/12 pytest passed) |
+| **Last Action** | PerspectiveTransformer implemented with 4-point homography and resolution scale (15/15 passed) |
 
 ---
 
@@ -87,7 +87,14 @@
 - [x] Safe full-image boundary fallback mechanism
 - [x] Integrated into scan API route, visualizing detected polyline preview
 - [x] Created `tests/test_edge_detector.py`
-- [x] **Gate test PASSED:** 12/12 pytest assertions pass
+**Phase 7 completed same session:**
+- [x] Created `backend/app/services/perspective.py`
+- [x] Dynamic Euclidean width and height calculation based on corner distance
+- [x] Homography perspective transformation with `cv2.getPerspectiveTransform` and `cv2.warpPerspective`
+- [x] Resolution re-scaling mapping downscaled detection coordinates back to raw image size
+- [x] API endpoint updated to generate flattened top-down document crop
+- [x] Created `tests/test_perspective.py`
+- [x] **Gate test PASSED:** 15/15 pytest assertions pass
 - [x] Committed to Git repository
 
 ---
@@ -103,7 +110,7 @@
 | 4 | Image Upload Integration | ✅ Done | ✅ |
 | 5 | CV Pipeline Core | ✅ Done | ✅ |
 | 6 | Document Detection | ✅ Done | ✅ |
-| 7 | Perspective Correction | ⬜ Not Started | ⬜ |
+| 7 | Perspective Correction | ✅ Done | ✅ |
 | 8 | Image Enhancement | ⬜ Not Started | ⬜ |
 | 9 | OCR Integration | ⬜ Not Started | ⬜ |
 | 10 | Result UI | ⬜ Not Started | ⬜ |
@@ -117,15 +124,14 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 7 — Perspective Correction
-- Create `backend/app/services/perspective.py`
-- Implement 4-point perspective warp (`four_point_transform`)
-- Calculate dynamic width and height from Euclidean distance between corners
-- Compute homography matrix using `cv2.getPerspectiveTransform`
-- Apply `cv2.warpPerspective` to flatten document into top-down scan
-- Scale coordinates back to original image resolution if resized
-- Unit test: distorted/angled quad transformed into clean top-down rectangular crop
-- Run Phase 7 test gate before Phase 8
+**Start with:** Phase 8 — Image Enhancement
+- Create `backend/app/services/image_enhancer.py`
+- CLAHE (Contrast Limited Adaptive Histogram Equalization) for uneven shadows
+- Adaptive Gaussian thresholding & Otsu binarization for clean high-contrast black/white scan
+- Unsharp masking / kernel sharpening
+- Configurable enhancement modes (`scan_bw`, `enhanced_color`, `sharpen`)
+- Unit test: enhanced image contrast and binarization verified
+- Run Phase 8 test gate before Phase 9
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

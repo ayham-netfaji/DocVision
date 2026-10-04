@@ -68,10 +68,10 @@
 
 ---
 
-## Phase 7 — Perspective Correction
-- [ ] `perspective.py` — four-corner ordering + `cv2.getPerspectiveTransform` + `cv2.warpPerspective`
-- [ ] Unit test: tilted document becomes rectangular
-- **Gate:** Pytest passes, output image is rectangular crop
+## Phase 7 — Perspective Correction ✅
+- [x] `perspective.py` — four-corner ordering + `cv2.getPerspectiveTransform` + `cv2.warpPerspective`
+- [x] Unit test: tilted document becomes rectangular
+- **Gate:** ✅ Pytest passes 15/15 tests, output image is rectangular top-down crop, scaled to full resolution
 
 ---
 
