@@ -59,12 +59,12 @@
 
 ---
 
-## Phase 6 — Document Detection
-- [ ] `edge_detector.py` — Canny edge detection + contour detection
-- [ ] Find largest 4-sided contour = document boundary
-- [ ] Fallback: if no 4-point contour found, use full image
-- [ ] Unit test: detect known document in test image
-- **Gate:** Pytest passes, document corners identified correctly
+## Phase 6 — Document Detection ✅
+- [x] `edge_detector.py` — Canny edge detection + contour detection
+- [x] Find largest 4-sided contour = document boundary
+- [x] Fallback: if no 4-point contour found, use full image
+- [x] Unit test: detect known document in test image
+- **Gate:** ✅ Pytest passes 12/12 tests, document corners identified correctly, fallback tested
 
 ---
 

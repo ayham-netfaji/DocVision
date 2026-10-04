@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 5 — CV Pipeline Core (OpenCV) |
+| **Active Phase** | Phase 6 — Document Detection |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 6 — Document Detection |
+| **Next Phase** | Phase 7 — Perspective Correction |
 | **Blockers** | None |
-| **Last Action** | OpenCV DocumentProcessor implemented, resize/grayscale/blur tested (9/9 passed) |
+| **Last Action** | EdgeDetector service built, 4-corner polygon detection + fallback verified (12/12 pytest passed) |
 
 ---
 
@@ -78,8 +78,17 @@
 - [x] Created `backend/app/services/document_processor.py` (load_image, resize_image, to_grayscale, apply_gaussian_blur)
 - [x] Integrated `DocumentProcessor` into `/api/v1/documents/scan` endpoint to save and serve real processed image
 - [x] Created `tests/test_document_processor.py`
-- [x] **Gate test PASSED:** 9/9 pytest assertions pass
-- [x] Requirements updated and committed to Git
+**Phase 6 completed same session:**
+- [x] Created `backend/app/services/edge_detector.py`
+- [x] Auto-Canny thresholding based on median intensity
+- [x] Morphological close and dilation to connect fragmented document boundaries
+- [x] Contour perimeter approximation (`approxPolyDP`) to isolate 4-point quadrilateral
+- [x] Mathematical 4-point ordering algorithm (Top-Left, Top-Right, Bottom-Right, Bottom-Left)
+- [x] Safe full-image boundary fallback mechanism
+- [x] Integrated into scan API route, visualizing detected polyline preview
+- [x] Created `tests/test_edge_detector.py`
+- [x] **Gate test PASSED:** 12/12 pytest assertions pass
+- [x] Committed to Git repository
 
 ---
 
@@ -93,7 +102,7 @@
 | 3 | Backend Foundation | ✅ Done | ✅ |
 | 4 | Image Upload Integration | ✅ Done | ✅ |
 | 5 | CV Pipeline Core | ✅ Done | ✅ |
-| 6 | Document Detection | ⬜ Not Started | ⬜ |
+| 6 | Document Detection | ✅ Done | ✅ |
 | 7 | Perspective Correction | ⬜ Not Started | ⬜ |
 | 8 | Image Enhancement | ⬜ Not Started | ⬜ |
 | 9 | OCR Integration | ⬜ Not Started | ⬜ |
@@ -108,15 +117,15 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 6 — Document Detection
-- Create `backend/app/services/edge_detector.py`
-- Canny edge detection (auto/adaptive thresholds)
-- Morphological close/dilation to bridge gaps
-- Find largest 4-sided contour = document boundary
-- Order 4 corner points (top-left, top-right, bottom-right, bottom-left)
-- Fallback: if no 4-point contour found, fallback safely to full image bounds
-- Unit tests: detect known angled rectangle document from synthetic test image
-- Run Phase 6 test gate before Phase 7
+**Start with:** Phase 7 — Perspective Correction
+- Create `backend/app/services/perspective.py`
+- Implement 4-point perspective warp (`four_point_transform`)
+- Calculate dynamic width and height from Euclidean distance between corners
+- Compute homography matrix using `cv2.getPerspectiveTransform`
+- Apply `cv2.warpPerspective` to flatten document into top-down scan
+- Scale coordinates back to original image resolution if resized
+- Unit test: distorted/angled quad transformed into clean top-down rectangular crop
+- Run Phase 7 test gate before Phase 8
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)
