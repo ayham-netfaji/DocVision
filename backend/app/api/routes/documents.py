@@ -75,6 +75,8 @@ async def scan_document(
 
     # 7. Image Enhancement (Phase 8)
     from app.services.image_enhancer import ImageEnhancer
+    from app.services.ocr_service import OCRService
+
     enhancer = ImageEnhancer()
     enhanced_doc = enhancer.enhance(warped_doc, mode="scan_bw")
 
@@ -82,16 +84,25 @@ async def scan_document(
     processed_path = settings.upload_dir / processed_filename
     cv2.imwrite(str(processed_path), enhanced_doc)
 
-    status_note = "Document boundary detected, perspective deskewed & enhanced" if detected else "Boundary fallback used, enhanced"
+    # 8. Optical Character Recognition (Phase 9)
+    ocr_service = OCRService()
+    ocr_result = ocr_service.extract_text(enhanced_doc)
 
-    # 8. Response with live preview paths
+    extracted_text = ocr_result.get("text", "")
+    confidence = ocr_result.get("confidence", 95.0)
+
+    if not extracted_text:
+        extracted_text = "[No text detected in document image]"
+        confidence = 0.0
+
+    # 9. Complete Response
     return DocumentScanResponse(
         document_id=doc_id,
         status="completed",
         original_image_url=f"/uploads/{filename}",
         processed_image_url=f"/uploads/{processed_filename}",
-        text=f"[DocVision CV Pipeline] {status_note}. Clean binarized scan generated ({enhanced_doc.shape[1]}x{enhanced_doc.shape[0]}px). Ready for Phase 9 (Tesseract OCR Engine).",
-        confidence=99.3
+        text=extracted_text,
+        confidence=confidence
     )
 
 @router.get("/{document_id}")

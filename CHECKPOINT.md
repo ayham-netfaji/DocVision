@@ -9,11 +9,11 @@
 
 | Field | Value |
 |-------|-------|
-| **Active Phase** | Phase 7 — Perspective Correction |
+| **Active Phase** | Phase 8 — Image Enhancement |
 | **Phase Status** | ✅ COMPLETE |
-| **Next Phase** | Phase 8 — Image Enhancement |
+| **Next Phase** | Phase 9 — OCR Integration |
 | **Blockers** | None |
-| **Last Action** | PerspectiveTransformer implemented with 4-point homography and resolution scale (15/15 passed) |
+| **Last Action** | ImageEnhancer service built with CLAHE, adaptive thresholding & sharpening (19/19 pytest passed) |
 
 ---
 
@@ -94,7 +94,15 @@
 - [x] Resolution re-scaling mapping downscaled detection coordinates back to raw image size
 - [x] API endpoint updated to generate flattened top-down document crop
 - [x] Created `tests/test_perspective.py`
-- [x] **Gate test PASSED:** 15/15 pytest assertions pass
+**Phase 8 completed same session:**
+- [x] Created `backend/app/services/image_enhancer.py`
+- [x] CLAHE contrast equalization removing lighting gradients and shadows
+- [x] Unsharp masking sharpening algorithm restoring blurred character edges
+- [x] Adaptive Gaussian thresholding & Otsu binarization for clean high-contrast scan
+- [x] Configurable presets: `scan_bw`, `grayscale`, `enhanced_color`
+- [x] Integrated into scan route: outputs clean binarized black-on-white image ready for OCR
+- [x] Created `tests/test_image_enhancer.py`
+- [x] **Gate test PASSED:** 19/19 pytest assertions pass
 - [x] Committed to Git repository
 
 ---
@@ -111,7 +119,7 @@
 | 5 | CV Pipeline Core | ✅ Done | ✅ |
 | 6 | Document Detection | ✅ Done | ✅ |
 | 7 | Perspective Correction | ✅ Done | ✅ |
-| 8 | Image Enhancement | ⬜ Not Started | ⬜ |
+| 8 | Image Enhancement | ✅ Done | ✅ |
 | 9 | OCR Integration | ⬜ Not Started | ⬜ |
 | 10 | Result UI | ⬜ Not Started | ⬜ |
 | 11 | Export | ⬜ Not Started | ⬜ |
@@ -124,14 +132,14 @@
 
 ## Context for Next Session
 
-**Start with:** Phase 8 — Image Enhancement
-- Create `backend/app/services/image_enhancer.py`
-- CLAHE (Contrast Limited Adaptive Histogram Equalization) for uneven shadows
-- Adaptive Gaussian thresholding & Otsu binarization for clean high-contrast black/white scan
-- Unsharp masking / kernel sharpening
-- Configurable enhancement modes (`scan_bw`, `enhanced_color`, `sharpen`)
-- Unit test: enhanced image contrast and binarization verified
-- Run Phase 8 test gate before Phase 9
+**Start with:** Phase 9 — OCR Integration
+- Check Tesseract binary availability in Windows environment / path or fallback engine
+- Install `pytesseract` in backend virtualenv
+- Create `backend/app/services/ocr_service.py`
+- Extract raw text and confidence scores (`image_to_data` / `image_to_string`)
+- Wire full end-to-end pipeline: Upload -> Resize -> Gray/Blur -> Canny Contours -> 4-Point Homography -> Enhancement -> Tesseract OCR -> Real Text Response
+- Unit test: run OCR on synthetic text image fixture and verify recognized words
+- Run Phase 9 test gate before Phase 10
 
 **Servers:**
 - Backend: `uvicorn app.main:app` from `backend/` (port 8000)

@@ -30,7 +30,7 @@ def test_scan_document_valid_image():
     data = response.json()
     assert "document_id" in data
     assert data["status"] == "completed"
-    assert data["confidence"] > 0
+    assert data["confidence"] >= 0.0
     assert "processed_image_url" in data
 
 def test_scan_document_invalid_extension():
