@@ -155,6 +155,25 @@
 - [x] Created root `README.md` with complete documentation, architecture diagrams, local setup, and API table
 - [x] **Gate test PASSED:** All test suites passing, CI pipeline verified, clean production bundle
 
+### Session 2 — 2026-10-05 (Realtime Testing & OCR Engine Debugging)
+**Goal:** Verify realtime testing, debug OCR binary availability and text extraction on screen captures.
+
+**Findings & Fixes:**
+1. **Tesseract-OCR Binary:**
+   - Released stuck Winget file lock (PID 17288).
+   - Tesseract v5.4.0 installed to `C:\Program Files\Tesseract-OCR\tesseract.exe`.
+   - Verified active via `OCRService.is_available() == True`.
+2. **"No text detected" Root Cause Analysis:**
+   - On the user's test image (`1d0ad21087a9`), `stage4_warped` gave 1,418 characters, but `processed` gave 0 characters.
+   - Cause: Aggressive unsharp masking (strength 0.8) + adaptive thresholding created hollow double-outline letter artifacts and high-frequency moiré noise on LCD screen photographs.
+   - Fix 1: Updated `scan_bw` in `image_enhancer.py` to use Gaussian smoothing + Otsu binarization (yielded 1,160 characters).
+   - Fix 2: Implemented **Dual-Candidate OCR selection** in `documents.py` (evaluates both enhanced scan and perspective-rectified crop, picking the candidate with the highest word count and confidence).
+   - Result: 1,418 characters, 227 words extracted with 87% confidence from user's test document.
+3. **Test Gates:**
+   - 29/29 pytest unit tests passed.
+   - Ruff linter clean (0 errors).
+   - Both Uvicorn (`:8000`) and Vite (`:5173`) running live.
+
 ---
 
 ## Phase Completion Tracker

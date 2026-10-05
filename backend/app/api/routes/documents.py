@@ -1,6 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -101,9 +102,16 @@ async def scan_document(
     processed_path = settings.upload_dir / processed_filename
     cv2.imwrite(str(processed_path), enhanced_doc)
 
-    # 8. Optical Character Recognition (Phase 9)
+    # 8. Optical Character Recognition (Phase 9 & Dual-Candidate Robustness)
     ocr_service = OCRService()
-    ocr_result = ocr_service.extract_text(enhanced_doc)
+    res_enhanced = ocr_service.extract_text(enhanced_doc)
+    res_warped = ocr_service.extract_text(warped_doc)
+
+    # Pick the candidate yielding higher word count and confidence
+    if res_warped.get("word_count", 0) > res_enhanced.get("word_count", 0):
+        ocr_result = res_warped
+    else:
+        ocr_result = res_enhanced if res_enhanced.get("word_count", 0) > 0 else res_warped
 
     extracted_text = ocr_result.get("text", "")
     confidence = ocr_result.get("confidence", 95.0)
@@ -218,3 +226,25 @@ async def delete_document(document_id: str, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="Document not found")
     return {"message": "Document deleted successfully", "document_id": document_id}
+
+
+@router.get("/{document_id}/image")
+async def get_document_image(
+    document_id: str,
+    processed: bool = False,
+    db: Session = Depends(get_db)
+):
+    doc = crud.get_document_by_id(db, document_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    path_str = doc.processed_image_path if processed and doc.processed_image_path else doc.original_image_path
+    if not path_str:
+        raise HTTPException(status_code=404, detail="Image path not found")
+
+    clean_filename = path_str.split("/")[-1]
+    full_path = settings.upload_dir / clean_filename
+    if not full_path.exists():
+        raise HTTPException(status_code=404, detail="Image file not found on disk")
+
+    return FileResponse(str(full_path))

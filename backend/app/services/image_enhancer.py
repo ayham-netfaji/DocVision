@@ -72,9 +72,10 @@ class ImageEnhancer:
         """
         if mode == "scan_bw":
             gray = self.to_grayscale(image)
-            equalized = self.apply_clahe(gray, clip_limit=2.5)
-            sharpened = self.sharpen_image(equalized, strength=0.8)
-            binary = self.adaptive_threshold_bw(sharpened, block_size=17, c_offset=10)
+            equalized = self.apply_clahe(gray, clip_limit=2.0)
+            # Use Gaussian smoothing + Otsu binarization to produce clean solid characters without moire noise
+            blurred = cv2.GaussianBlur(equalized, (3, 3), 0)
+            _, binary = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             return binary
 
         elif mode == "grayscale":
