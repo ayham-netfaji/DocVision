@@ -39,3 +39,10 @@ backend/uploads/*
 
 # Docker
 docker-compose.override.yml
+
+# Database & Cache
+*.db
+*.sqlite
+*.sqlite3
+.pytest_cache/
+.ruff_cache/
