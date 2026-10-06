@@ -32,7 +32,9 @@
 5. **Database Persistence & Scan History:**
    - SQLite (default) and PostgreSQL support with SQLAlchemy.
    - Searchable history table, scan thumbnail previews, and instant reload.
-6. **Docker & CI/CD Ready:**
+6. **AI Document Summarization:**
+   - Integrated OpenRouter API (Nvidia Nemotron model) for intelligent document summaries and classification.
+7. **Docker & CI/CD Ready:**
    - Multi-stage Docker build with Nginx reverse proxy.
    - Complete GitHub Actions CI pipeline running linters, tests, and container builds.
 
@@ -54,6 +56,9 @@ python -m venv .venv
 .venv\Scripts\activate
 # On Linux/macOS:
 source .venv/bin/activate
+
+# Configure Environment
+echo "OPENROUTER_API_KEY=your_key_here" > .env
 
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
@@ -121,6 +126,7 @@ npm run build
 | `GET` | `/api/v1/documents/{id}` | Retrieve specific document scan and stages |
 | `DELETE` | `/api/v1/documents/{id}` | Delete document and associated OCR results |
 | `GET` | `/api/v1/export/{id}/pdf` | Stream formatted PDF document report |
+| `POST` | `/api/v1/ai/summarize` | Generate AI summary for extracted text using OpenRouter |
 
 ---
 
