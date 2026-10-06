@@ -7,6 +7,7 @@ from app.api.routes.documents import router as documents_router
 from app.api.routes.export import router as export_router
 from app.api.routes.health import router as health_router
 from app.api.routes.ocr import router as ocr_router
+from app.api.routes.ai import router as ai_router
 from app.core.config import settings
 from app.db.session import Base, engine
 
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     app.include_router(documents_router, prefix=f"{settings.api_v1_prefix}/documents", tags=["Documents"])
     app.include_router(ocr_router, prefix=f"{settings.api_v1_prefix}/ocr", tags=["OCR"])
     app.include_router(export_router, prefix=f"{settings.api_v1_prefix}/export", tags=["Export"])
+    app.include_router(ai_router, prefix=f"{settings.api_v1_prefix}/ai", tags=["AI"])
 
     # Static file serving for uploads during dev
     app.mount("/uploads", StaticFiles(directory=str(settings.upload_dir)), name="uploads")

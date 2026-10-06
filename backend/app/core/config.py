@@ -10,8 +10,14 @@ class Settings(BaseSettings):
     max_file_size: int = 10 * 1024 * 1024  # 10MB
     allowed_extensions: set[str] = {"jpg", "jpeg", "png", "webp"}
     database_url: str = "sqlite:///./docvision.db"
+    gemini_api_key: str | None = None
+    openrouter_api_key: str | None = None
 
-    model_config = {"env_prefix": "DOCVISION_"}
+    model_config = {
+        "env_prefix": "DOCVISION_",
+        "env_file": ".env",
+        "extra": "ignore"
+    }
 
 
 settings = Settings()

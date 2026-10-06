@@ -9,7 +9,11 @@ import {
   Hash,
   Percent,
   Layers,
-  FileText
+  FileText,
+  Sparkles,
+  AlignLeft,
+  Tag,
+  Loader2
 } from 'lucide-react';
 import type { ProcessedDocument } from '../types/document';
 
@@ -34,24 +38,51 @@ export const Result: React.FC = () => {
     ? `${backendHost}${result.original_image_url}`
     : previewUrl;
 
-  const extractedText = result?.text || `[Default Preview]
+  const defaultText = result?.text || `[Default Preview]
 Document scanner pipeline ready.
 Scan your document from Workspace to see live OCR text extraction.`;
 
+  const [currentText, setCurrentText] = useState(defaultText);
+  const [classification, setClassification] = useState<string | null>(null);
+  const [summary, setSummary] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
   const confidence = result?.confidence ?? 98.5;
   const docId = result?.document_id ?? 'preview-doc';
-  const wordCount = result?.word_count ?? extractedText.split(/\s+/).filter(Boolean).length;
-  const charCount = result?.character_count ?? extractedText.length;
+  const wordCount = result?.word_count ?? currentText.split(/\s+/).filter(Boolean).length;
+  const charCount = result?.character_count ?? currentText.length;
   const stages = result?.stages || [];
 
+  const handleAIAction = async (action: 'correct' | 'summarize' | 'classify') => {
+    setIsAiLoading(true);
+    try {
+      const response = await fetch(`${backendHost}/api/v1/ai/${action}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: currentText }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.detail || 'AI request failed. The model might be experiencing high demand (503).');
+      
+      if (action === 'correct') setCurrentText(data.result);
+      if (action === 'summarize') setSummary(data.result);
+      if (action === 'classify') setClassification(data.result);
+    } catch (error: any) {
+      console.error(error);
+      alert(`AI Action Failed: ${error.message}`);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
+
   const handleCopy = () => {
-    navigator.clipboard.writeText(extractedText);
+    navigator.clipboard.writeText(currentText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleDownload = () => {
-    const blob = new Blob([extractedText], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([currentText], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -61,7 +92,7 @@ Scan your document from Workspace to see live OCR text extraction.`;
   };
 
   const handleDownloadPDF = () => {
-    const pdfUrl = `${backendHost}/api/v1/export/${docId}/pdf?confidence=${confidence}&text=${encodeURIComponent(extractedText)}`;
+    const pdfUrl = `${backendHost}/api/v1/export/${docId}/pdf?confidence=${confidence}&text=${encodeURIComponent(currentText)}`;
     const link = document.createElement('a');
     link.href = pdfUrl;
     link.download = `DocVision_${docId}.pdf`;
@@ -96,6 +127,13 @@ Scan your document from Workspace to see live OCR text extraction.`;
             <Percent className="w-3.5 h-3.5" />
             <span>Confidence: {confidence}%</span>
           </div>
+
+          {classification && (
+            <div className="flex items-center gap-1 text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20 px-3 py-1.5 rounded-full">
+              <Tag className="w-3.5 h-3.5" />
+              <span>Type: {classification}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -167,6 +205,18 @@ Scan your document from Workspace to see live OCR text extraction.`;
               </div>
 
               <div className="flex items-center gap-2">
+                {/* AI Actions */}
+                <button
+                  onClick={() => handleAIAction('summarize')}
+                  disabled={isAiLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 border border-purple-500/30 rounded-lg transition disabled:opacity-50 cursor-pointer"
+                  title="Generate a summary"
+                >
+                  {isAiLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <AlignLeft className="w-3.5 h-3.5" />}
+                  <span className="hidden sm:inline">Summarize</span>
+                </button>
+
+                <div className="w-px h-6 bg-slate-700 mx-1"></div>
                 {/* Font Size Selector */}
                 <div className="flex items-center bg-slate-800/80 border border-slate-700 rounded-lg p-0.5 text-xs">
                   <button
@@ -220,9 +270,21 @@ Scan your document from Workspace to see live OCR text extraction.`;
                 fontSize === 'sm' ? 'text-xs' : fontSize === 'base' ? 'text-sm' : 'text-base'
               }`}
             >
-              {extractedText}
+              {currentText}
             </div>
           </div>
+
+          {/* AI Summary Panel */}
+          {summary && (
+            <div className="col-span-1 lg:col-span-2 bg-gradient-to-r from-purple-900/20 to-slate-900/60 border border-purple-500/20 rounded-2xl p-6">
+              <h3 className="text-base font-semibold text-purple-400 mb-3 flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> AI Summary
+              </h3>
+              <div className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
+                {summary}
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         /* Academic CV Showcase: All Computer Vision Stages */
